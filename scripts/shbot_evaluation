@@ -1,0 +1,242 @@
+import json
+from langchain_community.chat_models import ChatOllama
+from langchain_core.messages import HumanMessage, AIMessage, ChatMessage
+from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.memory import ChatMessageHistory
+
+import nltk
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from datasets import load_metric
+#   uncomment following line if punkt is not installed.
+#   nltk.download('punkt')
+from sentence_transformers import SentenceTransformer, util
+
+
+llm = ChatOllama(
+    base_url="http://127.0.0.1:5000",
+    model="shtest",
+    #format="json",
+    keep_alive=-1, # keep the model loaded indefinitely
+    #temperature=0.1,
+    #max_new_tokens=512
+    )
+# To unload the model and free up memory use:
+# curl http://localhost:5000/api/generate -d '{"model": "shtest", "keep_alive": 0}'
+# Invoke-RestMethod -Uri "http://localhost:5000/api/generate" -Method Post -Body '{"model": "shtest", "keep_alive": 0}' -ContentType "application/json"
+
+
+def evaluate_model(references, generated_responses):
+    # Calculate BLEU score
+    bleu_scores = []
+    for ref, gen in zip(references, generated_responses):
+        ref_tokens = nltk.word_tokenize(ref)
+        gen_tokens = nltk.word_tokenize(gen)
+        score = sentence_bleu([ref_tokens], gen_tokens, smoothing_function=SmoothingFunction().method1)
+        bleu_scores.append(score)
+    average_bleu_score = sum(bleu_scores) / len(bleu_scores)
+
+    # Calculate ROUGE score
+    rouge = load_metric("rouge")
+    rouge_results = rouge.compute(predictions=generated_responses, references=references)
+
+    return average_bleu_score, rouge_results
+
+
+def extract_json_from_strings(string_list):
+    """
+    Extracts JSON objects from a list of strings.
+
+    This function searches each string in the string_list for a JSON object which is meant to be used for the LLMs responses.
+    If found, it extracts the JSON object, replaces any 'None' values with 'null',
+    and then converts it into a Python dictionary.
+
+    Args:
+        string_list (list of str): The list of strings to search for JSON objects.
+
+    Returns:
+        list of dict: A list of extracted JSON objects as dictionaries. If no JSON object 
+                      is found in a string, the corresponding entry in the list is None.
+    """
+    generated_jsons = []
+    for i, string in enumerate(string_list):
+        string = string.replace("'", '"')
+        json_start_index = string.find('{')
+        json_end_index = string.rfind('}')
+        if json_start_index != -1 and json_end_index != -1:
+            json_string = string[json_start_index:json_end_index+1]
+            json_string = json_string.replace("None", "null")  # Replace None with null since dumb python maps it to its None type
+            try:
+                json_object = json.loads(json_string)
+                generated_jsons.append(json_object)
+            except json.JSONDecodeError:
+                print(f"Error decoding JSON from string: {string}")
+                generated_jsons.append(None)  # Placeholder for invalid JSON
+            string_list[i] = string[:json_start_index-1] + string[json_end_index+2:]
+        else:
+            generated_jsons.append(None)  # Placeholder for no JSON found
+    return generated_jsons
+
+
+def evaluate_jsons(generated_responses, generated_jsons, expected_json_values):
+    correct_count = 0
+    total_count = len(generated_responses)
+    
+    # Initialize variables to count total keys and correct keys
+    total_keys = 0
+    correct_keys = 0
+
+    for response, generated_json, expected_json in zip(generated_responses, generated_jsons, expected_json_values):
+        if expected_json is not None and isinstance(expected_json, str):
+            try:
+                expected_json = json.loads(expected_json)
+            except json.JSONDecodeError:
+                print(f"Error decoding JSON from expected value: {expected_json}")
+                continue
+        
+        # Check if both expected JSON and generated JSON are None
+        if expected_json is None and generated_json is None:
+            correct_count += 1
+            continue
+        
+        # Check if expected JSON is None
+        if expected_json is None:
+            
+            #correct_count += 0.5
+            if generated_json.get("action")=="none": 
+                correct_count += 1
+                print("Expected JSON is None and bot responed with a none action in response:", response)
+                continue
+
+            print("Expected JSON is None for response:", response)
+            continue
+        
+        # Check if generated JSON is None
+        if generated_json is None:
+            print("Generated JSON is None for response:", response)
+            continue
+
+        # Compare actual JSON with expected JSON values
+        try:
+
+            keys_correct = all(generated_json.get(key) == expected_json.get(key) for key in expected_json)
+            if keys_correct:
+                correct_count += 1
+            
+            # Update total keys and correct keys count
+            for key in expected_json:
+                total_keys += 1
+                if generated_json.get(key) == expected_json.get(key):
+                    correct_keys += 1
+        except AttributeError:
+            print("Error comparing JSON for response:", response)
+    
+    # Calculate accuracy
+    accuracy = correct_count / total_count
+    key_accuracy = correct_keys / total_keys if total_keys > 0 else 0
+
+    return accuracy, key_accuracy
+
+def calculate_semantic_similarity(references, generated_responses):
+    model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+    embeddings1 = model.encode(references, convert_to_tensor=True)
+    embeddings2 = model.encode(generated_responses, convert_to_tensor=True)
+    cosine_scores = util.pytorch_cos_sim(embeddings1, embeddings2)
+    
+    for i in range(len(references)):
+        print(f"Reference: {references[i]}")
+        print(f"Generated Response: {generated_responses[i]}")
+        print(f"Cosine Similarity: {cosine_scores[i][i].item()}\n")
+    
+    average_similarity = cosine_scores.diag().mean().item()
+    return average_similarity
+
+def load_evaluation_dataset_from_json(filename):
+    with open(filename, 'r', encoding='utf-8') as jsonfile:
+        data = json.load(jsonfile)
+    
+    def replace_none(value):
+        return None if value == "None" else value
+    
+    inputs = [replace_none(item['Input']) for item in data]
+    expected_outputs = [replace_none(item['Expected Output']) for item in data]
+    expected_json_values = [replace_none(item['Expected JSON Output']) for item in data]
+    
+    return inputs, expected_outputs, expected_json_values
+
+def process_evaluation_dataset(inputs):
+    # Initialize lists to store the results
+    results = []
+    messages_stored = []
+
+    # Iterate over each input in the dataset
+    for input_data in inputs:
+        # Parse the input data into a list of messages
+        messages = parse_messages(input_data)
+        messages_stored.append(messages)
+
+        # Create a chat prompt from the messages
+        prompt = ChatPromptTemplate.from_messages(messages)
+
+        # Invoke the language model to generate a response
+        result = invoke_language_model(llm, prompt)
+
+        # Store the generated response
+        results.append(result)
+    
+    return results, messages_stored   
+
+def parse_messages(input_data):
+    # Parse the input data into a list of messages
+    messages = []
+    for message_data in json.loads(input_data):
+        if message_data['role'] == 'user':
+            messages.append(HumanMessage(content=message_data['content']))
+        elif message_data['role'] == 'assistant':
+            messages.append(AIMessage(content=message_data['content']))
+    return messages
+
+def invoke_language_model(llm, prompt):
+    # Invoke the language model to generate a response
+    chain = prompt | llm | StrOutputParser()
+    result = chain.invoke({})
+    return result
+
+# MAIN CODE
+# Load dataset
+print("############# LOADING DATASET #############")
+inputs, expected_outputs, expected_json_values = load_evaluation_dataset_from_json('evaluation_dataset.json')
+print(inputs)
+print("-------------------------------------------")
+print(expected_outputs)
+print("-------------------------------------------")
+print(expected_json_values)
+print("-------------------------------------------")
+
+# Generate responses from model
+generated_responses, messages_stored = process_evaluation_dataset(inputs)
+print(generated_responses)
+print(messages_stored)
+
+# extract jsons from generated responses (this also deletes the json from the message.)
+print("############# repsones and jsons #############")
+generated_jsons = extract_json_from_strings(generated_responses)
+print(generated_responses)
+print(generated_jsons)
+
+# calculate BLEU and ROUGE metrics
+print("############# BLEU/ROUGE #############")
+average_bleu_score, rouge_results = evaluate_model(expected_outputs, generated_responses)
+print(average_bleu_score)
+print(rouge_results)
+
+# evaluate semantic similarity
+print("############# SEMANTIC SIMILARITY #############")
+average_similarity = calculate_semantic_similarity(expected_outputs, generated_responses)
+print(average_similarity)
+
+# caluclate json accuracy
+print("############# JSON ACCURACY #############")
+accuracy, key_accuracy = evaluate_jsons(generated_responses, generated_jsons, expected_json_values)
+print(accuracy)
+print(key_accuracy)

@@ -1,0 +1,7 @@
+inputs; generated outputs; expected outputs; generated jsons; expected jsons; BLEUs; ROUGEs; semantic similarities; json accuracies;;;Metrics;Avg. Values
+input1; generated output1; expected output1; generated json1; expected json1; BLEU1; ROUGE1; semantic similarity1; json accuracy1;;;BLEU;value
+input2; generated output2; expected output2; generated json2; expected json2; BLEU1; ROUGE2; semantic similarity2; json accuracy2;;;ROUGE;value
+input3; generated output3; expected output3; generated json3; expected json3; BLEU1; ROUGE3; semantic similarity3; json accuracy3;;;Sem. Similarity;value
+input4; generated output4; expected output4; generated json4; expected json4; BLEU1; ROUGE4; semantic similarity4; json accuracy4;;;json accuracy;value
+input5; generated output5; expected output5; generated json5; expected json5; BLEU1; ROUGE5; semantic similarity5; json accuracy5;;;json key accuracy;value
+…;…;…;…;…;…;…;…;…;;;;

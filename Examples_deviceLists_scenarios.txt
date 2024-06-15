@@ -1,0 +1,672 @@
+####### 10 example device lists #######
+1. User has multiple thermostats in the same room
+[
+    {
+        "type": "RADIATOR_THERMOSTAT",
+        "name": "Living Room Thermostat 1",
+        "deviceID": "hdm:HomeMaticIP:3014F711A0000055385A0CF1",
+        "state": [
+            {
+                "id": "ValveTappet",
+                "state": {"valvePosition": 0}
+            },
+            {
+                "id": "Thermostat",
+                "state": {"childLock": "OFF"}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 21.0}
+            }
+        ],
+        "room": "Living Room"
+    },
+    {
+        "type": "RADIATOR_THERMOSTAT",
+        "name": "Living Room Thermostat 2",
+        "deviceID": "hdm:HomeMaticIP:3014F711A0000055385A0CF2",
+        "state": [
+            {
+                "id": "ValveTappet",
+                "state": {"valvePosition": 0}
+            },
+            {
+                "id": "Thermostat",
+                "state": {"childLock": "OFF"}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 22.5}
+            }
+        ],
+        "room": "Living Room"
+    },
+    {
+        "type": "ROOM_CLIMATE_CONTROL",
+        "name": "RoomClimateControl-Living Room",
+        "deviceID": "roomClimateControl_lr_1",
+        "state": [
+            {
+                "id": "RoomClimateControl",
+                "state": {"operationMode": "AUTOMATIC", "setpointTemperature": 20.0}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 22.0}
+            }
+        ],
+        "room": "Living Room"
+    }
+]
+
+
+2. User has thermostats in different rooms
+[
+    {
+        "type": "RADIATOR_THERMOSTAT",
+        "name": "Living Room Thermostat",
+        "deviceID": "hdm:HomeMaticIP:3014F711A0000055385A0CF1",
+        "state": [
+            {
+                "id": "ValveTappet",
+                "state": {"valvePosition": 0}
+            },
+            {
+                "id": "Thermostat",
+                "state": {"childLock": "OFF"}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 21.0}
+            }
+        ],
+        "room": "Living Room"
+    },
+    {
+        "type": "RADIATOR_THERMOSTAT",
+        "name": "Bedroom Thermostat",
+        "deviceID": "hdm:HomeMaticIP:3014F711A0000055385A0CF2",
+        "state": [
+            {
+                "id": "ValveTappet",
+                "state": {"valvePosition": 0}
+            },
+            {
+                "id": "Thermostat",
+                "state": {"childLock": "OFF"}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 22.5}
+            }
+        ],
+        "room": "Bedroom"
+    },
+    {
+        "type": "ROOM_CLIMATE_CONTROL",
+        "name": "RoomClimateControl-Living Room",
+        "deviceID": "roomClimateControl_lr_1",
+        "state": [
+            {
+                "id": "RoomClimateControl",
+                "state": {"operationMode": "AUTOMATIC", "setpointTemperature": 20.0}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 21.5}
+            }
+        ],
+        "room": "Living Room"
+    },
+    {
+        "type": "ROOM_CLIMATE_CONTROL",
+        "name": "RoomClimateControl-Bedroom",
+        "deviceID": "roomClimateControl_br_1",
+        "state": [
+            {
+                "id": "RoomClimateControl",
+                "state": {"operationMode": "AUTOMATIC", "setpointTemperature": 18.0}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 22.0}
+            }
+        ],
+        "room": "Bedroom"
+    }
+]
+
+
+3. User has multiple door-window contacts in the same room
+[
+    {
+        "type": "SHUTTER_CONTACT",
+        "name": "Living Room Window Contact 1",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000009A1858FA5C",
+        "state": [
+            {
+                "id": "ShutterContact",
+                "state": {"contactState": "CLOSED"}
+            }
+        ],
+        "room": "Living Room"
+    },
+    {
+        "type": "SHUTTER_CONTACT",
+        "name": "Living Room Window Contact 2",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000009A1858FA5D",
+        "state": [
+            {
+                "id": "ShutterContact",
+                "state": {"contactState": "OPEN"}
+            }
+        ],
+        "room": "Living Room"
+    }
+]
+
+
+4. User has multiple smart plugs in the same room
+[
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Bedroom Smart Plug 1",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593469",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 0, "energyConsumption": 0}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "OFF"}
+            }
+        ],
+        "room": "Bedroom"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Bedroom Smart Plug 2",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593470",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 10, "energyConsumption": 50}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Bedroom"
+    }
+]
+
+
+5. User has no thermostat
+[
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Bedroom Smart Plug",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593469",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 0, "energyConsumption": 0}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "OFF"}
+            }
+        ],
+        "room": "Bedroom"
+    },
+    {
+        "type": "SHUTTER_CONTACT",
+        "name": "Living Room Window Contact",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000009A1858FA5C",
+        "state": [
+            {
+                "id": "ShutterContact",
+                "state": {"contactState": "CLOSED"}
+            }
+        ],
+        "room": "Living Room"
+    }
+]
+
+
+6. German Example I
+[
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Küchensteckdose",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593471",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 5, "energyConsumption": 20}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Küche"
+    },
+    {
+        "type": "SHUTTER_CONTACT",
+        "name": "Haustürkontakt",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000009A1858FA5E",
+        "state": [
+            {
+                "id": "ShutterContact",
+                "state": {"contactState": "OPEN"}
+            }
+        ],
+        "room": "Eingangsbereich"
+    },
+    {
+        "type": "RADIATOR_THERMOSTAT",
+        "name": "Büro-Thermostat",
+        "deviceID": "hdm:HomeMaticIP:3014F711A0000055385A0CF3",
+        "state": [
+            {
+                "id": "ValveTappet",
+                "state": {"valvePosition": 10}
+            },
+            {
+                "id": "Thermostat",
+                "state": {"childLock": "OFF"}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 23.0}
+            }
+        ],
+        "room": "Büro"
+    },
+    {
+        "type": "ROOM_CLIMATE_CONTROL",
+        "name": "Raumklimakontrolle-Büro",
+        "deviceID": "roomClimateControl_buero_1",
+        "state": [
+            {
+                "id": "RoomClimateControl",
+                "state": {"operationMode": "AUTOMATIC", "setpointTemperature": 21.0}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 23.0}
+            }
+        ],
+        "room": "Büro"
+    }
+]
+
+
+7. German Example II
+[
+    {
+        "type": "SHUTTER_CONTACT",
+        "name": "Terrassentürkontakt",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000009A1858FA5F",
+        "state": [
+            {
+                "id": "ShutterContact",
+                "state": {"contactState": "CLOSED"}
+            }
+        ],
+        "room": "Wohnzimmer"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Wohnzimmerlampe",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593472",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 15, "energyConsumption": 45}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Wohnzimmer"
+    },
+    {
+        "type": "RADIATOR_THERMOSTAT",
+        "name": "Schlafzimmer-Thermostat",
+        "deviceID": "hdm:HomeMaticIP:3014F711A0000055385A0CF4",
+        "state": [
+            {
+                "id": "ValveTappet",
+                "state": {"valvePosition": 0}
+            },
+            {
+                "id": "Thermostat",
+                "state": {"childLock": "OFF"}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 19.0}
+            }
+        ],
+        "room": "Schlafzimmer"
+    },
+    {
+        "type": "ROOM_CLIMATE_CONTROL",
+        "name": "Raumklimakontrolle-Schlafzimmer",
+        "deviceID": "roomClimateControl_schlafzimmer_1",
+        "state": [
+            {
+                "id": "RoomClimateControl",
+                "state": {"operationMode": "AUTOMATIC", "setpointTemperature": 18.0}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 19.0}
+            }
+        ],
+        "room": "Schlafzimmer"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Schlafzimmer-Ventilator",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593473",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 30, "energyConsumption": 100}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "OFF"}
+            }
+        ],
+        "room": "Schlafzimmer"
+    }
+]
+
+
+8. German Example III
+[
+    {
+        "type": "RADIATOR_THERMOSTAT",
+        "name": "Küchenthermostat",
+        "deviceID": "hdm:HomeMaticIP:3014F711A0000055385A0CF5",
+        "state": [
+            {
+                "id": "ValveTappet",
+                "state": {"valvePosition": 20}
+            },
+            {
+                "id": "Thermostat",
+                "state": {"childLock": "OFF"}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 22.0}
+            }
+        ],
+        "room": "Küche"
+    },
+    {
+        "type": "ROOM_CLIMATE_CONTROL",
+        "name": "Raumklimakontrolle-Küche",
+        "deviceID": "roomClimateControl_kueche_1",
+        "state": [
+            {
+                "id": "RoomClimateControl",
+                "state": {"operationMode": "AUTOMATIC", "setpointTemperature": 20.0}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 22.0}
+            }
+        ],
+        "room": "Küche"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Kaffeemaschine",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593474",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 60, "energyConsumption": 120}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "OFF"}
+            }
+        ],
+        "room": "Küche"
+    },
+    {
+        "type": "SHUTTER_CONTACT",
+        "name": "Garagentor-Kontakt",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000009A1858FA5G",
+        "state": [
+            {
+                "id": "ShutterContact",
+                "state": {"contactState": "OPEN"}
+            }
+        ],
+        "room": "Garage"
+    }
+]
+
+
+9. Random Example
+[
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Office Desk Lamp",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593475",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 10, "energyConsumption": 50}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Office"
+    },
+    {
+        "type": "SHUTTER_CONTACT",
+        "name": "Office Window Contact",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000009A1858FA5H",
+        "state": [
+            {
+                "id": "ShutterContact",
+                "state": {"contactState": "CLOSED"}
+            }
+        ],
+        "room": "Office"
+    },
+    {
+        "type": "RADIATOR_THERMOSTAT",
+        "name": "Bathroom Thermostat",
+        "deviceID": "hdm:HomeMaticIP:3014F711A0000055385A0CF6",
+        "state": [
+            {
+                "id": "ValveTappet",
+                "state": {"valvePosition": 5}
+            },
+            {
+                "id": "Thermostat",
+                "state": {"childLock": "OFF"}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 24.0}
+            }
+        ],
+        "room": "Bathroom"
+    },
+    {
+        "type": "ROOM_CLIMATE_CONTROL",
+        "name": "RoomClimateControl-Bathroom",
+        "deviceID": "roomClimateControl_bathroom_1",
+        "state": [
+            {
+                "id": "RoomClimateControl",
+                "state": {"operationMode": "AUTOMATIC", "setpointTemperature": 23.0}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 24.0}
+            }
+        ],
+        "room": "Bathroom"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Bathroom Heater",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593476",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 100, "energyConsumption": 300}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Bathroom"
+    }
+]
+
+
+10. Random Example
+[
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "TV",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593477",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 50, "energyConsumption": 200}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Living Room"
+    },
+    {
+        "type": "SHUTTER_CONTACT",
+        "name": "Patio Door Contact",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000009A1858FA5I",
+        "state": [
+            {
+                "id": "ShutterContact",
+                "state": {"contactState": "OPEN"}
+            }
+        ],
+        "room": "Living Room"
+    },
+    {
+        "type": "RADIATOR_THERMOSTAT",
+        "name": "Bedroom Thermostat",
+        "deviceID": "hdm:HomeMaticIP:3014F711A0000055385A0CF7",
+        "state": [
+            {
+                "id": "ValveTappet",
+                "state": {"valvePosition": 0}
+            },
+            {
+                "id": "Thermostat",
+                "state": {"childLock": "OFF"}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 21.0}
+            }
+        ],
+        "room": "Bedroom"
+    },
+    {
+        "type": "ROOM_CLIMATE_CONTROL",
+        "name": "RoomClimateControl-Bedroom",
+        "deviceID": "roomClimateControl_bedroom_1",
+        "state": [
+            {
+                "id": "RoomClimateControl",
+                "state": {"operationMode": "AUTOMATIC", "setpointTemperature": 20.0}
+            },
+            {
+                "id": "TemperatureLevel",
+                "state": {"temperature": 21.0}
+            }
+        ],
+        "room": "Bedroom"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Fan",
+        "deviceID": "hdm:HomeMaticIP:3014F711A000049878593478",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 20, "energyConsumption": 60}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "OFF"}
+            }
+        ],
+        "room": "Bedroom"
+    }
+]
+
+
+
+####### 10 example scenarios #######
+Scenario 1: Checking the State of a Specific Device
+User: "What's the current power consumption of the Küchensteckdose?"
+Bot: "The current power consumption of the Küchensteckdose is 5 watts."
+
+Scenario 2: Turning a Device On/Off
+User: "Can you turn on the Wohnzimmerlampe?"
+Bot: "The Wohnzimmerlampe is now turned on."
+
+Scenario 3: Checking the Temperature
+User: "What is the temperature in the Schlafzimmer?"
+Bot: "The current temperature in the Schlafzimmer is 19.0 degrees Celsius."
+
+Scenario 4: Setting a Desired Temperature
+User: "Set the desired temperature in the Büro to 22 degrees."
+Bot: "The desired temperature in the Büro is now set to 22 degrees."
+
+Scenario 5: Checking the Status of Window Contacts
+User: "Is the Terrassentürkontakt open?"
+Bot: "Yes, the Terrassentürkontakt is currently open."
+
+Scenario 6: Finding Out Which Devices Are in a Specific Room
+User: "What devices are in the Küche?"
+Bot: "The devices in the Küche are the Küchenthermostat, Kaffeemaschine, and the Raumklimakontrolle-Küche."
+
+Scenario 7: Checking All Thermostats
+User: "Show me the status of all thermostats."
+Bot: "The thermostats' statuses are as follows: Büro-Thermostat is at 23.0 degrees, Schlafzimmer-Thermostat is at 19.0 degrees, and the Küchenthermostat is at 22.0 degrees."
+
+Scenario 8: Energy Consumption Summary
+User: "How much energy has the Wohnzimmerlampe consumed?"
+Bot: "The Wohnzimmerlampe has consumed 45 kWh of energy."
+
+Scenario 9: Child Lock Status
+User: "Is the child lock on for the Heizkörper-Thermostat?"
+Bot: "No, the child lock for the Heizkörper-Thermostat is currently off."
+
+Scenario 10: Checking All Devices
+User: "Can you show me the status of all my devices?"
+Bot: "Sure, here is the status of all your devices: Küchenthermostat (Küche) Valve Position: 20% Child Lock: OFF Temperature: 22.0°C Raumklimakontrolle-Küche (Küche) Operation Mode: AUTOMATIC Setpoint Temperature: 20.0°C Temperature: 22.0°C Kaffeemaschine (Küche) Power Consumption: 60W Energy Consumption: 120 kWh Switch State: OFF Garagentor-Kontakt (Garage) Contact State: OPEN"

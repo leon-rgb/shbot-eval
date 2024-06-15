@@ -1,0 +1,21 @@
+
+POST http://192.168.0.220:5000/api/chat
+
+{
+    "model": "shllama",
+    "messages": [
+        {
+            "role": "user",
+            "content": "message: 'hello' data: '[{\"type\": \"POWER_METER_SWITCH\", \"name\": \"TV\", \"deviceID\": \"device123\", \"state\": [{\"id\": \"PowerSwitch\", \"state\": {\"switchState\": \"OFF\"}}], \"room\": \"Schlafzimmer\"}, {\"type\": \"SHUTTER_CONTACT\", \"name\": \"WindowSensor-67890\", \"deviceID\": \"device456\", \"state\": [{\"id\": \"ShutterContact\", \"state\": {\"value\": \"CLOSED\"}}], \"room\": \"Wohnzimmer\"}]'"
+        },
+        {
+            "role": "assistant",
+            "content": "hello, I'm SHBot. Your Smart Home Assistant. How can I help you?"
+        },
+        {
+            "role": "user",
+            "content": "message: 'Can you turn on my TV?' data'[{\"type\": \"POWER_METER_SWITCH\", \"name\": \"TV\", \"deviceID\": \"device123\", \"state\": [{\"id\": \"PowerSwitch\", \"state\": {\"switchState\": \"OFF\"}}], \"room\": \"Schlafzimmer\"}, {\"type\": \"SHUTTER_CONTACT\", \"name\": \"WindowSensor-67890\", \"deviceID\": \"device456\", \"state\": [{\"id\": \"ShutterContact\", \"state\": {\"value\": \"CLOSED\"}}], \"room\": \"Wohnzimmer\"}]'"
+        }
+    ],
+    "stream": false
+}

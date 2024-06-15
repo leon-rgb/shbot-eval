@@ -1,0 +1,48 @@
+POST http://127.0.0.1:5000/api/chat
+
+{
+    "model": "shtest",
+    "messages": [
+        {
+            "role": "user",
+            "content": "[ { \"type\": \"POWER_METER_SWITCH\", \"name\": \"Kaffeemaschine\", \"deviceID\": \"deviceABC123\", \"state\": [ { \"id\": \"PowerSwitch\", \"state\": { \"switchState\": \"OFF\" } } ], \"room\": \"Wohnzimmer\" }, { \"type\": \"POWER_METER_SWITCH\", \"name\": \"Laptop\", \"deviceID\": \"deviceXYZ456\", \"state\": [ { \"id\": \"PowerSwitch\", \"state\": { \"switchState\": \"ON\" } } ], \"room\": \"Schlafzimmer\" }, { \"type\": \"RADIATOR_THERMOSTAT\", \"name\": \"Heizkörper-Thermostat1\", \"deviceID\": \"deviceDEF789\", \"state\": [ { \"id\": \"TemperatureLevel\", \"state\": { \"temperature\": 22.5 } } ], \"room\": \"Küche\" }, { \"type\": \"ROOM_CLIMATE_CONTROL\", \"name\": \"RoomClimateControl1\", \"deviceID\": \"deviceGHI012\", \"state\": [ { \"id\": \"RoomClimateControl\", \"state\": { \"setpointTemperature\": 21.0 } } ], \"room\": \"Küche\" }, { \"type\": \"RADIATOR_THERMOSTAT\", \"name\": \"Heizkörper-Thermostat2\", \"deviceID\": \"deviceJKL345\", \"state\": [ { \"id\": \"TemperatureLevel\", \"state\": { \"temperature\": 20.0 } } ], \"room\": \"Badezimmer\" }, { \"type\": \"ROOM_CLIMATE_CONTROL\", \"name\": \"RoomClimateControl2\", \"deviceID\": \"deviceMNO678\", \"state\": [ { \"id\": \"RoomClimateControl\", \"state\": { \"setpointTemperature\": 19.0 } } ], \"room\": \"Badezimmer\" } ]"
+        },
+        {
+            "role": "user",
+            "content": "Kannst du die Temperatur im Wohnzimmer ändern?"
+        },
+        {
+            "role": "assistant",
+            "content": "Ich sehe, dass es keine Raum-Klima-Steuereinheit (ROOM_CLIMATE_CONTROL) im Wohnzimmer gibt. Die Thermostate in den Räumen Küche und Badezimmer können nicht verwendet werden, um die Temperatur im Wohnzimmer zu ändern.\n\nWenn du eine bestimmte Temperatur im Wohnzimmer haben möchtest, musst du entweder ein neues Raum-Klima-Steuereinheit installieren oder einen anderen Thermostat in das Wohnzimmer hinzufügen."
+        },
+        {
+            "role": "user",
+            "content": "Kannst du denn die Temperatur im Badezimmer ändern?"
+        },
+        {
+            "role": "assistant",
+            "content": "Ja, ich kann die Temperatur im Badezimmer ändern! Es gibt eine Raum-Klima-Steuereinheit (ROOM_CLIMATE_CONTROL) im Badezimmer, die den Soll-Wärmelevel auf 19 Grad Celsius eingestellt hat. Ich kann die Temperatur im Badezimmer auf einen neuen Wert ändern.\n\nbosch-smarthome {\n  \"action\": \"change-temperature\",\n  \"value\": \"your desired temperature\",\n  \"deviceID\": \"deviceMNO678\",\n  \"device\": \"ROOM_CLIMATE_CONTROL\",\n  \"room\": \"Badezimmer\",\n  \"name\": \"RoomClimateControl2\"\n}"
+        },
+        {
+            "role": "user",
+            "content": "Kannst du 23 Grad einstellen?"
+        },
+        {
+            "role": "assistant",
+            "content": "Ja, ich kann die Temperatur im Badezimmer auf 23 Grad Celsius ändern!\n\nbosch-smarthome {\n  \"action\": \"change-temperature\",\n  \"value\": \"23\",\n  \"deviceID\": \"deviceMNO678\",\n  \"device\": \"ROOM_CLIMATE_CONTROL\",\n  \"room\": \"Badezimmer\",\n  \"name\": \"RoomClimateControl2\"\n}"
+        },
+        {
+            "role": "user",
+            "content": "Wie ist die Temperatur im Badezimmer eingestellt?"
+        },
+        {
+            "role": "assistant",
+            "content": "Die Temperatur im Badezimmer ist auf 23 Grad Celsius eingestellt. bosch-smarthome {\n  \"action\": \"read-state\",\n  \"deviceID\": \"deviceMNO678\",\n  \"device\": \"ROOM_CLIMATE_CONTROL\",\n  \"room\": \"Badezimmer\",\n  \"name\": \"RoomClimateControl2\"\n}"
+        },
+        {
+            "role": "user",
+            "content": "Sind Fenster offen?"
+        }
+    ],
+    "stream": false
+}
