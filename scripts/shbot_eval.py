@@ -408,32 +408,3 @@ average_metrics = {
 
 print("############# WRITING RESULTS TO EXCEL #############")
 write_results_to_excel(inputs, generated_responses, expected_outputs, generated_jsons, expected_json_values, similarities, json_accuracy_flags, average_metrics)
-
-
-
-"""
-generated_responses = [
-    "Ja, klar! Ich werde die Temperatur im Badezimmer auf 23 Grad Celsius ändern. { \"action\": \"change-temperature\", \"value\": \"23\", \"deviceID\": \"randomDeviceID5\", \"device\": \"RoomClimateControl\", \"room\": \"Badezimmer\", \"name\": \"-RoomClimateControl-\" }",
-    "Sure, turning on the Zwischenstecker now. { \"action\": \"turn-on\", \"deviceID\": \"hdm:HomeMaticIP:3014F711A000049878593469\", \"device\": \"POWER_METER_SWITCH\", \"room\": \"Schlafzimmer\", \"name\": \"Zwischenstecker\" }",
-    "Klar, ich werde die Temperatur im Büro auf 22 Grad ändern. { \"action\": \"change-temperature\", \"value\": \"22\", \"deviceID\": \"randomDeviceID5\", \"device\": \"RoomClimateControl\", \"room\": \"Office\", \"name\": \"-RoomClimateControl-\" } (Assuming there is a device named -RoomClimateControl- in the Office room)",
-    "No, your Zwischenstecker is off. ```json { \"action\": \"none\", \"deviceID\": \"hdm:HomeMaticIP:3014F711A000049878593469\", \"device\": \"POWER_METER_SWITCH\", \"room\": \"Schlafzimmer\" } ```"
-]
-print(generated_responses)
-
-expected_jsons = [
-    "{ \"action\": \"change-temperature\", \"value\": \"23\", \"deviceID\": \"deviceMNO678\" }",
-    "{\"action\": \"turn-on\", \"deviceID\": \"hdm:HomeMaticIP:3014F711A000049878593469\"}",
-    "{\"action\": \"change-temperature\", \"value\": \"22\", \"deviceID\": \"roomClimateControl_buero_1\"}",
-    None
-]
-
-generated_jsons = extract_json_from_strings(generated_responses)
-print(generated_responses)
-print(generated_jsons)
-print("---------------------------")
-
-json_accuracy, json_key_accuracy, json_accuracy_flags = evaluate_jsons(generated_responses, generated_jsons, expected_jsons)
-print(json_accuracy)
-print(json_key_accuracy)
-print(json_accuracy_flags)
-"""
