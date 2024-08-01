@@ -26,7 +26,7 @@ import os
 # Initialize language model
 llm = ChatOllama(
     base_url="http://127.0.0.1:5000",
-    model="shtest",
+    model="sh-llama32",
     keep_alive=-1
 )
 
@@ -45,21 +45,71 @@ def extract_json_from_strings(string_list):
     generated_jsons = []
     for i, string in enumerate(string_list):
         string = string.replace("'", '"')
+        json_strings = []
+        
+        # Find the substring before the first '{'
         json_start_index = string.find('{')
-        json_end_index = string.rfind('}')
-        if json_start_index != -1 and json_end_index != -1:
-            json_string = string[json_start_index:json_end_index+1]
-            json_string = json_string.replace("None", "null")
-            try:
-                json_object = json.loads(json_string)
-                generated_jsons.append(json_object)
-            except json.JSONDecodeError:
-                print(f"Error decoding JSON from string: {string}")
-                generated_jsons.append(None)
-            string_list[i] = string[:json_start_index-1] + string[json_end_index+2:]
+        if json_start_index != -1:
+            pre_json_string = string[:json_start_index-1]
         else:
+            pre_json_string = string
+        
+        # Extract JSON substrings
+        while json_start_index != -1:
+            json_end_index = string.find('}', json_start_index)
+            if json_end_index == -1:
+                break
+            json_string = string[json_start_index:json_end_index+1]
+            json_strings.append(json_string)
+            string = string[json_end_index+1:]
+            json_start_index = string.find('{')
+        
+        if len(json_strings) == 0:
             generated_jsons.append(None)
+        elif len(json_strings) == 1:
+            try:
+                json_object = json.loads(json_strings[0])
+                generated_jsons.append(json_object)
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON from string: {json_strings[0]}")
+                print(f"Error details: {e}")
+                generated_jsons.append(None)
+        else:
+            # Handle multiple JSONs in the same string
+            print(f"Multiple JSONs found in string: {string}")
+            error_json = {"error": "response contains multiple JSONs which is invalid"}
+            generated_jsons.append(error_json)
+        
+        # Replace the string in string_list with the substring before the first '{'
+        string_list[i] = pre_json_string
+    
     return generated_jsons
+
+def normalize_value(value):
+    """Normalize the value for comparison."""
+    try:
+        # Try to convert strings that represent numbers to float
+        return float(value)
+    except (ValueError, TypeError):
+        # If it's not a number or it's already a number, return it as is
+        return value
+
+def compare_jsons(generated_json, expected_json):
+    """Compare two JSON objects with normalized values."""
+    if generated_json is None or expected_json is None:
+        return generated_json == expected_json
+    
+    for key in expected_json:
+        if key not in generated_json:
+            return False
+        # normalize value if the key is "value"
+        if key == "value":
+            if normalize_value(generated_json[key]) != normalize_value(expected_json[key]):
+                return False
+        else:
+            if generated_json[key] != expected_json[key]:
+                return False
+    return True
 
 def evaluate_jsons(generated_responses, generated_jsons, expected_json_values):
     correct_count = 0
@@ -98,7 +148,7 @@ def evaluate_jsons(generated_responses, generated_jsons, expected_json_values):
             continue
 
         try:
-            keys_correct = all(generated_json.get(key) == expected_json.get(key) for key in expected_json)
+            keys_correct = compare_jsons(generated_json, expected_json)
             if keys_correct:
                 correct_count += 1
                 json_accuracy_flags.append(True)
@@ -107,7 +157,7 @@ def evaluate_jsons(generated_responses, generated_jsons, expected_json_values):
             
             for key in expected_json:
                 total_keys += 1
-                if generated_json.get(key) == expected_json.get(key):
+                if normalize_value(generated_json.get(key)) == normalize_value(expected_json.get(key)):
                     correct_keys += 1
         except AttributeError:
             print("Error comparing JSON for response:", response)
@@ -171,13 +221,18 @@ def process_evaluation_dataset(inputs):
     return results, messages_stored   
 
 def parse_messages(input_data):
-    messages = []
-    for message_data in json.loads(input_data):
-        if message_data['role'] == 'user':
-            messages.append(HumanMessage(content=message_data['content']))
-        elif message_data['role'] == 'assistant':
-            messages.append(AIMessage(content=message_data['content']))
-    return messages
+    try:
+        messages = []
+        for message_data in json.loads(input_data):
+            if message_data['role'] == 'user':
+                messages.append(HumanMessage(content=message_data['content']))
+            elif message_data['role'] == 'assistant':
+                messages.append(AIMessage(content=message_data['content']))
+        return messages
+    except json.JSONDecodeError as e:
+        print("JSON decode error:", e)
+        print("Offending input data:", input_data)
+        raise e
 
 def invoke_language_model(llm, prompt):
     chain = prompt | llm | StrOutputParser()
@@ -189,12 +244,16 @@ def calculate_classification_metrics(similarities, json_accuracy_flags, similari
     y_pred = []
 
     for similarity, json_correct in zip(similarities, json_accuracy_flags):
+        # True label is positive if JSON is correct
+        y_true.append(1 if json_correct else 0)
+
+        # Predicted positive if similarity is above threshold and JSON is correct
         if similarity >= similarity_threshold and json_correct:
             y_pred.append(1)
         else:
             y_pred.append(0)
-        y_true.append(1 if json_correct else 0)  # Assuming the ground truth is based on JSON correctness
 
+    # Calculate precision, recall, and F1 score
     precision = precision_score(y_true, y_pred)
     recall = recall_score(y_true, y_pred)
     f1 = f1_score(y_true, y_pred)
@@ -280,10 +339,13 @@ def write_results_to_excel(inputs, generated_responses, expected_outputs, genera
         wb.save(filename)
         print(f"File saved as: {filename}")
 
+
+
+
 # MAIN CODE
 print("############# LOADING DATASET #############")
 #inputs, expected_outputs, expected_json_values = load_evaluation_dataset_from_json('evaluation_dataset.json')
-inputs, expected_outputs, expected_json_values = load_evaluation_dataset_from_csv('evaluation_dataset.csv')
+inputs, expected_outputs, expected_json_values = load_evaluation_dataset_from_csv('evaluation_dataset_final.csv')
 print(inputs)
 print("-------------------------------------------")
 print(expected_outputs)
@@ -324,7 +386,7 @@ print(json_key_accuracy)
 
 # Calculate classification metrics based on semantic similarity and JSON accuracy
 print("############# CLASSIFICATION METRICS BASED ON SEMANTIC SIMILARITY AND JSON ACCURACY #############")
-precision, recall, f1 = calculate_classification_metrics(similarities, json_accuracy_flags, similarity_threshold=0.8)
+precision, recall, f1 = calculate_classification_metrics(similarities, json_accuracy_flags, similarity_threshold=0.65)
 print("Precision:", precision)
 print("Recall:", recall)
 print("F1 Score:", f1)
@@ -346,3 +408,32 @@ average_metrics = {
 
 print("############# WRITING RESULTS TO EXCEL #############")
 write_results_to_excel(inputs, generated_responses, expected_outputs, generated_jsons, expected_json_values, similarities, json_accuracy_flags, average_metrics)
+
+
+
+"""
+generated_responses = [
+    "Ja, klar! Ich werde die Temperatur im Badezimmer auf 23 Grad Celsius ändern. { \"action\": \"change-temperature\", \"value\": \"23\", \"deviceID\": \"randomDeviceID5\", \"device\": \"RoomClimateControl\", \"room\": \"Badezimmer\", \"name\": \"-RoomClimateControl-\" }",
+    "Sure, turning on the Zwischenstecker now. { \"action\": \"turn-on\", \"deviceID\": \"hdm:HomeMaticIP:3014F711A000049878593469\", \"device\": \"POWER_METER_SWITCH\", \"room\": \"Schlafzimmer\", \"name\": \"Zwischenstecker\" }",
+    "Klar, ich werde die Temperatur im Büro auf 22 Grad ändern. { \"action\": \"change-temperature\", \"value\": \"22\", \"deviceID\": \"randomDeviceID5\", \"device\": \"RoomClimateControl\", \"room\": \"Office\", \"name\": \"-RoomClimateControl-\" } (Assuming there is a device named -RoomClimateControl- in the Office room)",
+    "No, your Zwischenstecker is off. ```json { \"action\": \"none\", \"deviceID\": \"hdm:HomeMaticIP:3014F711A000049878593469\", \"device\": \"POWER_METER_SWITCH\", \"room\": \"Schlafzimmer\" } ```"
+]
+print(generated_responses)
+
+expected_jsons = [
+    "{ \"action\": \"change-temperature\", \"value\": \"23\", \"deviceID\": \"deviceMNO678\" }",
+    "{\"action\": \"turn-on\", \"deviceID\": \"hdm:HomeMaticIP:3014F711A000049878593469\"}",
+    "{\"action\": \"change-temperature\", \"value\": \"22\", \"deviceID\": \"roomClimateControl_buero_1\"}",
+    None
+]
+
+generated_jsons = extract_json_from_strings(generated_responses)
+print(generated_responses)
+print(generated_jsons)
+print("---------------------------")
+
+json_accuracy, json_key_accuracy, json_accuracy_flags = evaluate_jsons(generated_responses, generated_jsons, expected_jsons)
+print(json_accuracy)
+print(json_key_accuracy)
+print(json_accuracy_flags)
+"""

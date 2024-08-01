@@ -1,0 +1,35 @@
+how can I add to this code that each string_list entry is replaced with the string before the first "{" of that entry? (so to say that the json is extracted and romved from the string_list)
+
+def extract_json_from_strings(string_list):
+    generated_jsons = []
+    for i, string in enumerate(string_list):
+        string = string.replace("'", '"')
+        json_strings = []
+        
+        # Find all JSON substrings in the string
+        while True:
+            json_start_index = string.find('{')
+            json_end_index = string.find('}')
+            if json_start_index == -1 or json_end_index == -1:
+                break
+            json_string = string[json_start_index:json_end_index+1]
+            json_strings.append(json_string)
+            string = string[json_end_index+1:]
+        
+        if len(json_strings) == 0:
+            generated_jsons.append(None)
+        elif len(json_strings) == 1:
+            try:
+                json_object = json.loads(json_strings[0])
+                generated_jsons.append(json_object)
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON from string: {json_strings[0]}")
+                print(f"Error details: {e}")
+                generated_jsons.append(None)
+        else:
+            # Handle multiple JSONs in the same string
+            print(f"Multiple JSONs found in string: {string}")
+            error_json = {"error": "response contains multiple JSONs which is invalid"}
+            generated_jsons.append(error_json)
+    
+    return generated_jsons

@@ -1,0 +1,127 @@
+I have a evaluation dataset in CSV format for my smart home chatbot. I want you to provide a new line depending on the device list and messages I provide.
+You have to put the device list and messages in the correct input format which is a list of messages which contain a role and a content each.
+Based on the messages you should formulate an expected natural language output for the user request. 
+Also, you should create a json that contains ONLY the necessary variables/values for the action that is needed to be called.
+For the below messages what could be outputs of the LLM?
+
+CSV format:
+Input;Expected Output;Expected JSON Output
+"[{""role"": ""user"", ""content"": ""[{\""type\"":\""POWER_METER_SWITCH\"",\""name\"":\""Zwischenstecker\"",\""deviceID\"":\""hdm:HomeMaticIP:3014F711A000049878593469\"",\""state\"":[{\""id\"":\""PowerMeter\"",\""state\"":{\""powerConsumption\"":0,\""energyConsumption\"":0}},{\""id\"":\""PowerSwitch\"",\""state\"":{\""switchState\"":\""OFF\""}}],\""room\"":\""Schlafzimmer\""},{\""type\"":\""SHUTTER_CONTACT\"",\""name\"":\""Fenster Esszimmer\"",\""deviceID\"":\""hdm:HomeMaticIP:3014F711A000009A1858FA5C\"",\""state\"":[{\""id\"":\""ShutterContact\"",\""state\"":{\""contactState\"":\""CLOSED\""}}],\""room\"":\""Wohnzimmer\""},{\""type\"":\""RADIATOR_THERMOSTAT\"",\""name\"":\""Heizkörper-Thermostat\"",\""deviceID\"":\""hdm:HomeMaticIP:3014F711A0000055385A0CF1\"",\""state\"":[{\""id\"":\""ValveTappet\"",\""state\"":{\""valvePosition\"":0}},{\""id\"":\""Thermostat\"",\""state\"":{\""childLock\"":\""OFF\""}},{\""id\"":\""TemperatureLevel\"",\""state\"":{\""temperature\"":27.5}}],\""room\"":\""Schlafzimmer\""},{\""type\"":\""ROOM_CLIMATE_CONTROL\"",\""name\"":\""-RoomClimateControl-\"",\""deviceID\"":\""roomClimateControl_hz_2\"",\""state\"":[{\""id\"":\""RoomClimateControl\"",\""state\"":{\""operationMode\"":\""AUTOMATIC\"",\""setpointTemperature\"":17}},{\""id\"":\""TemperatureLevel\"",\""state\"":{\""temperature\"":27.5}}],\""room\"":\""Schlafzimmer\""}]""}, {""role"": ""user"", ""content"": ""hello""}]";Hello, I'm SHBot. How can I help you with your smart home?;None
+"[{""role"": ""user"", ""content"": ""[{\""type\"":\""POWER_METER_SWITCH\"",\""name\"":\""Zwischenstecker\"",\""deviceID\"":\""hdm:HomeMaticIP:3014F711A000049878593469\"",\""state\"":[{\""id\"":\""PowerMeter\"",\""state\"":{\""powerConsumption\"":0,\""energyConsumption\"":0}},{\""id\"":\""PowerSwitch\"",\""state\"":{\""switchState\"":\""OFF\""}}],\""room\"":\""Schlafzimmer\""}]""}, {""role"": ""user"", ""content"": ""Turn on the Zwischenstecker, please.""}]";The Zwischenstecker in your bedroom is now on.;"{""action"": ""turn-on"", ""deviceID"": ""hdm:HomeMaticIP:3014F711A000049878593469"", ""device"": ""POWER_METER_SWITCH""}"
+"[{""role"":""user"",""content"":""[{\""type\"":\""POWER_METER_SWITCH\"",\""name\"":\""Zwischenstecker\"",\""deviceID\"":\""hdm:HomeMaticIP:3014F711A000049878593469\"",\""state\"":[{\""id\"":\""PowerMeter\"",\""state\"":{\""powerConsumption\"":0,\""energyConsumption\"":0}},{\""id\"":\""PowerSwitch\"",\""state\"":{\""switchState\"":\""OFF\""}}],\""room\"":\""Schlafzimmer\""}]""},{""role"":""user"",""content"":""Is my Zwischenstecker on?""}]";No, your Zwischenstecker is currently turned off.;None
+Important: always match the backslashes in the first content similar to the examples! Your outputs should have the exact same format as the 3 examples.
+
+available actions and needed paramaters:
+'none' - doesn't need parameters. Is used if the chatbot doesn't need to call an action. For example when the user asks if a device is on the chatbot can directly use the device list provided to answer.
+'turn-on' - needs deviceID
+'turn-off' needs deviceID
+'change-temperature' - needs value (always a string) and deviceID (always a string) of corresponding room-climate-control.
+Important to know: room-climate control is a virtual device in the smart home that manages the temperature (called setPointTemperature) of the thermostats in the same room. If no thermostat exists, the system won't create a room climate control. If thermostats are added to the smart home a room-climate-control for the selected room of the thermostat is automatically created if no room-climate-control exists for that room. Every room with a thermostat has therefore a room-climate-control.
+
+device list:
+[
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Living Room TV",
+        "deviceID": "hdm:SmartHome:LivingRoomTV001",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 50, "energyConsumption": 300}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Living Room"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Kitchen Coffee Machine",
+        "deviceID": "hdm:SmartHome:KitchenCoffee001",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 5, "energyConsumption": 20}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "OFF"}
+            }
+        ],
+        "room": "Kitchen"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Bedroom Lamp",
+        "deviceID": "hdm:SmartHome:BedroomLamp001",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 20, "energyConsumption": 100}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Bedroom"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "PC",
+        "deviceID": "hdm:SmartHome:PC001",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 100, "energyConsumption": 500}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Home Office"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Home Office Desk Lamp",
+        "deviceID": "hdm:SmartHome:HomeOfficeDeskLamp001",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 15, "energyConsumption": 80}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "ON"}
+            }
+        ],
+        "room": "Home Office"
+    },
+    {
+        "type": "POWER_METER_SWITCH",
+        "name": "Home Office Printer",
+        "deviceID": "hdm:SmartHome:HomeOfficePrinter001",
+        "state": [
+            {
+                "id": "PowerMeter",
+                "state": {"powerConsumption": 30, "energyConsumption": 150}
+            },
+            {
+                "id": "PowerSwitch",
+                "state": {"switchState": "OFF"}
+            }
+        ],
+        "room": "Home Office"
+    }
+]
+
+messages:
+Turn on PC.
+Schalte den Drucker an.
+Turn on printer.
+Change temperture to 22 degrees.
+Wie viel Strom verbrauchen alle Meine Geräte momentan zusammen?
+Wie viel Strom hat mein Pc insgesamt verbraucht?
